@@ -32,3 +32,10 @@ SetAllTake1
 
 SplitBlips
 - Creates splits where blips are made in the left channel audio during the span of the selected video track.
+
+SelectRegionEvents
+- Selects all track events within the selection region.
+
+GroupOverlappingEvents
+- Groups overlapping selected track events.
+- Requires 1 track to be selected that contains selected track events.
