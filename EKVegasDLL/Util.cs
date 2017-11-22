@@ -282,6 +282,35 @@ namespace EKVegas
             }
         }
 
+        //Splits track event at a global timecode, keeps the left piece, discards the right piece
+        public void SplitAndKeepLeft(ref TrackEvent trackEvent, Timecode globalLocation)
+        {
+            TrackEvent rightVideoEvent = trackEvent.Split(globalLocation - trackEvent.Start);
+            TrackEvent leftVideoEvent = trackEvent;
+            if (rightVideoEvent != null)
+                trackEvent.Track.Events.Remove(rightVideoEvent);
+            trackEvent = leftVideoEvent;
+        }
+
+        //Splits track event at a global timecode, keeps the right piece, discards the left piece
+        public void SplitAndKeepRight(ref TrackEvent trackEvent, Timecode globalLocation)
+        {
+            TrackEvent rightVideoEvent = trackEvent.Split(globalLocation - trackEvent.Start);
+            TrackEvent leftVideoEvent = trackEvent;
+            if (leftVideoEvent != null)
+                trackEvent.Track.Events.Remove(leftVideoEvent);
+            trackEvent = rightVideoEvent;
+        }
+
+        //Trims the start of the track event to a global timecode and sets the duration
+        public void TrimEvent(ref TrackEvent trackEvent, Timecode globalLocation, Timecode duration)
+        {
+            SplitAndKeepRight(ref trackEvent, globalLocation);
+            if (trackEvent == null)
+                return;
+            trackEvent.AdjustStartLength(trackEvent.Start, duration, false);
+        }
+
     }//public class Util
 
 }//namespace EKVegas

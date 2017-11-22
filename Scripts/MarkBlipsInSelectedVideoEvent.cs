@@ -20,38 +20,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Creates splits where blips are made in the left channel audio
-// during the span of the selected video track.
+// Finds all blips of a selected video event(inserted by the Blipper) and adds a bookmark at that location.
+// Hit 'solo' on the audio track of the video event before running this script.
 
 using ScriptPortal.Vegas;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using EKVegas;
+using NAudio.Midi;
 
 public class EntryPoint
-{    
+{
     Vegas vegas = null;
     Util util = null;
     WavUtil wavUtil = null;
 
+    List<WavUtil.Blip> blips;
+    VideoEvent selectedVideoEvent;
+
     public void FromVegas(Vegas vegas)
-    {        
+    {
         this.vegas = vegas;
         this.util = new Util(vegas);
         this.wavUtil = new WavUtil(vegas, util);
 
-        VideoEvent videoEvent = util.GetFirstSelectedVideoEvent();
+        processBlips();
 
-        if (videoEvent == null)
+        foreach (WavUtil.Blip blip in blips)
+        {
+            vegas.Project.Markers.Add(new Marker(new Timecode(blip.locationInMicroseconds/1000) + selectedVideoEvent.Start, blip.pulseCount+""));
+        }
+    }
+
+    void processBlips()
+    {
+        selectedVideoEvent = util.GetFirstSelectedVideoEvent();
+
+        if (selectedVideoEvent == null)
         {
             util.ShowError("No video event selected");
             return;
         }
-
+    
         //Create a temporary WAV file, and export the audio span of selected video event
-        string wavePath = wavUtil.CreateVideoEventWAV(videoEvent);
+        string wavePath = wavUtil.CreateVideoEventWAV(selectedVideoEvent);
 
-        if(wavePath == null)
+        if (wavePath == null)
         {
             util.ShowError("Unable to export temporary WAV");
             return;
@@ -69,8 +84,8 @@ public class EntryPoint
         //Delete the temporary file
         File.Delete(wavePath);
 
-        //Find all blips in the left channel and split tracks at blips
-        List<WavUtil.Blip> blips = wavUtil.FindBlips(rightChannel);
-        wavUtil.SplitAtBlips(videoEvent, blips);
+        //Find all blips in the right channel and split tracks at blips
+        blips = wavUtil.FindBlips(rightChannel);
     }
+
 }
