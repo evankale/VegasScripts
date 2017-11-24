@@ -11,6 +11,13 @@ Compilation note for Sony Vegas (v13 and under):
 - The namespace name of the .NET assembly has changed from Sony.Vegas to ScriptPortal.Vegas in v14 and onward
   - Change "using ScriptPortal.Vegas;" to "using Sony.Vegas;" in the scripts to compile for v13 and under
 
+Install
+=======
+- Scripts belong in the Vegas install directory, in the "Script Menu" folder.
+  - (ie. C:\Program Files\VEGAS\VEGAS Pro 14.0\Script Menu\)
+- Some scripts require additional DLLs, put them in a "DLL" folder in the "Script Menu" folder.
+  - (ie. C:\Program Files\VEGAS\VEGAS Pro 14.0\Script Menu\DLL\)
+  - Majority of these scripts require a common DLL, EKVegas.dll, included here in "EKVegasDLL\bin\EKVegas.dll"
 
 Scripts
 =======
@@ -27,6 +34,7 @@ DisableResampleForAllVideos
 
 MapBlipsToMIDI
 - Maps all blips (created by the Blipper) to MIDI notes of an input MIDI file.
+- Requires NAudio.dll (https://github.com/naudio/NAudio)
 
 MarkBlipsInSelectedVideoEvent
 - Finds all blips of a selected video event(inserted by the Blipper) and adds a bookmark at that location.
